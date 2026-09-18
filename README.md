@@ -1,17 +1,17 @@
 # FairGlass
 
-### Proof-of-Fair AI Hiring on Midnight
-
-FairGlass is a privacy-first hiring prototype that uses a **Midnight Compact smart contract** to cryptographically prove that an AI-assisted hiring decision followed an agreed fairness policy, without exposing candidate data.
+### ⚖️ Privacy-Preserving AI Hiring Verification
 
 <div align="center">
 
-![FairGlass](https://img.shields.io/badge/FairGlass-Privacy--First%20AI%20Hiring-111827?style=for-the-badge)
+![FairGlass](https://img.shields.io/badge/FairGlass-Privacy--Preserving%20AI%20Hiring-111827?style=for-the-badge)
 ![Midnight](https://img.shields.io/badge/Midnight-Compact-6366F1?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white)
 
 **Prove fairness. Preserve privacy.**
+
+*Cryptographically verify that an AI-assisted hiring decision followed a fairness policy, without exposing candidate data.*
 
 </div>
 
@@ -22,23 +22,21 @@ FairGlass is a privacy-first hiring prototype that uses a **Midnight Compact sma
 
 ---
 
-## ✨ Why FairGlass?
+## ✨ What is FairGlass?
 
-AI hiring systems can use attributes that a hiring policy explicitly forbids. FairGlass separates **decision-making from proof**:
+FairGlass is a privacy-first hiring verification prototype built around one simple idea:
 
-- Fair scoring uses only allowed attributes.
-- A biased scoring mode demonstrates a policy violation.
-- The Midnight contract verifies whether the policy was followed.
-- A successful verification produces a **fairness receipt**.
-- Candidate information stays off-chain.
+> **Don't expose the candidate data. Prove that the hiring policy was followed.**
 
-**FairGlass proves that a policy was followed, not that a candidate was hired.**
+FairGlass separates the **hiring decision** from the **proof of compliance**. Candidate information stays off-chain while Midnight Compact verifies whether the decision respected the defined fairness policy.
+
+### 🔎 The idea in one line
+
+**Candidate Data → AI Score → Fairness Policy → Cryptographic Proof → Verifiable Receipt**
 
 ---
 
 ## 🧭 The Fairness Pipeline
-
-The complete decision path can be visualized as:
 
 ```mermaid
 flowchart LR
@@ -59,21 +57,7 @@ flowchart LR
     H --> J["🚫 No Receipt"]
 
     I --> K["🌐 Verifiable Result"]
-    
-    style A fill:#111827,color:#fff,stroke:#6366f1
-    style B fill:#1f2937,color:#fff,stroke:#8b5cf6
-    style C fill:#064e3b,color:#fff,stroke:#10b981
-    style D fill:#7f1d1d,color:#fff,stroke:#ef4444
-    style E fill:#312e81,color:#fff,stroke:#818cf8
-    style F fill:#172554,color:#fff,stroke:#60a5fa
-    style G fill:#065f46,color:#fff,stroke:#34d399
-    style H fill:#991b1b,color:#fff,stroke:#f87171
-    style I fill:#064e3b,color:#fff,stroke:#34d399
-    style J fill:#450a0a,color:#fff,stroke:#f87171
-    style K fill:#111827,color:#fff,stroke:#a78bfa
 ```
-
-> **Visual idea:** follow the flow from candidate data → scoring → policy → cryptographic proof → receipt. The two branches make the fair vs. biased behavior immediately visible.
 
 ---
 
@@ -106,16 +90,11 @@ flowchart TB
     P2 --> S
     P3 --> S
     P4 --> S
-
     S --> W
     P5 --> H
     W --> H
     H --> C
     C --> R
-
-    style PRIVATE fill:#111827,color:#fff,stroke:#64748b
-    style APP fill:#172554,color:#fff,stroke:#60a5fa
-    style PUBLIC fill:#052e16,color:#fff,stroke:#34d399
 ```
 
 ### Public vs. Private
@@ -134,13 +113,12 @@ flowchart TB
 
 | Feature | Description |
 | --- | --- |
-| **⚖️ Fair AI Scoring** | Scores candidates using skills and experience |
-| **🛡️ Policy Enforcement** | Rejects proofs when forbidden attributes affect a decision |
+| **⚖️ Fair AI Scoring** | Uses skills and experience for the fair scoring path |
+| **🛡️ Policy Enforcement** | Detects when forbidden attributes affect a decision |
 | **🔒 Privacy by Design** | Keeps candidate data and witness data off-chain |
 | **🧾 Fairness Receipts** | Produces a verifiable receipt when the policy passes |
 | **🔑 Commitment-Based IDs** | Uses fresh SHA-256 commitments instead of exposing candidate IDs |
-| **⚠️ Biased Model Demo** | Shows how forbidden attributes are detected |
-| **🔗 Local Proof Flow** | Witness data is consumed by the local proof server |
+| **⚠️ Biased Model Demo** | Demonstrates how policy violations are detected |
 
 ---
 
@@ -171,11 +149,6 @@ flowchart LR
 
     P1 -->|"Allowed"| PASS["✅ Receipt"]
     P2 -->|"Forbidden attribute detected"| FAIL["❌ Rejected"]
-
-    style FAIR fill:#052e16,color:#fff,stroke:#22c55e
-    style BIASED fill:#450a0a,color:#fff,stroke:#ef4444
-    style PASS fill:#064e3b,color:#fff,stroke:#34d399
-    style FAIL fill:#7f1d1d,color:#fff,stroke:#f87171
 ```
 
 Try candidates **c4** and **c5** across both runs to see how the forbidden attribute changes the outcome.
@@ -233,8 +206,6 @@ Frontend: `http://localhost:8080`
 
 ### Privacy page
 
-With the app running, open:
-
 ```text
 http://localhost:8080/privacy.html
 ```
@@ -243,7 +214,7 @@ Run the screening twice and compare commitments to inspect the hiding/binding be
 
 ---
 
-## 📜 Policy
+## 📜 Fairness Policy
 
 ### Allowed attributes
 - Skills
