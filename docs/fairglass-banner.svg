@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="FairGlass Privacy-Preserving AI Hiring Verification">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#07111F"/><stop offset=".48" stop-color="#101B35"/><stop offset="1" stop-color="#081B1A"/>
+  </linearGradient>
+  <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#7DD3FC"/><stop offset=".45" stop-color="#A78BFA"/><stop offset="1" stop-color="#34D399"/>
+  </linearGradient>
+  <linearGradient id="text" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#67E8F9"/><stop offset=".5" stop-color="#C4B5FD"/><stop offset="1" stop-color="#6EE7B7"/>
+  </linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity=".35"/></filter>
+</defs>
+<rect width="1200" height="300" rx="28" fill="url(#bg)"/>
+<circle cx="105" cy="65" r="72" fill="#22D3EE" opacity=".08"/><circle cx="1090" cy="245" r="110" fill="#A78BFA" opacity=".08"/>
+<path d="M0 230 C180 170 290 280 470 210 S790 125 1200 205" fill="none" stroke="#67E8F9" stroke-opacity=".12" stroke-width="2"/>
+<path d="M0 250 C180 190 300 295 490 225 S820 145 1200 220" fill="none" stroke="#A78BFA" stroke-opacity=".10" stroke-width="1"/>
+<g filter="url(#shadow)">
+  <rect x="62" y="62" width="176" height="176" rx="42" fill="#FFFFFF" fill-opacity=".055" stroke="url(#glass)" stroke-width="2"/>
+  <path d="M150 88 L199 106 V145 C199 183 177 205 150 218 C123 205 101 183 101 145 V106 Z" fill="none" stroke="url(#glass)" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M126 150 l17 17 35-40" fill="none" stroke="#F0FDFA" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="215" cy="88" r="7" fill="#6EE7B7" filter="url(#glow)"/>
+</g>
+<text x="275" y="125" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="68" font-weight="800" letter-spacing="-2" fill="url(#text)">FairGlass</text>
+<text x="279" y="164" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" letter-spacing="4" fill="#CBD5E1">PRIVACY-PRESERVING AI HIRING</text>
+<text x="279" y="202" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17" fill="#94A3B8">Prove fairness. Preserve privacy.</text>
+<g transform="translate(280 226)">
+  <rect width="102" height="30" rx="15" fill="#22D3EE" fill-opacity=".10" stroke="#22D3EE" stroke-opacity=".45"/>
+  <text x="51" y="20" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" fill="#67E8F9">PRIVATE DATA</text>
+  <path d="M112 15 H150" stroke="url(#glass)" stroke-width="2"/>
+  <circle cx="151" cy="15" r="3" fill="#A78BFA"/>
+  <rect x="163" width="92" height="30" rx="15" fill="#A78BFA" fill-opacity=".10" stroke="#A78BFA" stroke-opacity=".45"/>
+  <text x="209" y="20" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" fill="#C4B5FD">FAIRNESS</text>
+  <path d="M265 15 H303" stroke="url(#glass)" stroke-width="2"/>
+  <circle cx="304" cy="15" r="3" fill="#6EE7B7"/>
+  <rect x="316" width="92" height="30" rx="15" fill="#34D399" fill-opacity=".10" stroke="#34D399" stroke-opacity=".45"/>
+  <text x="362" y="20" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" font-weight="700" fill="#6EE7B7">PROOF</text>
+</g>
+</svg>
