@@ -1,175 +1,275 @@
-# FairGlass: Proof-of-Fair AI Hiring
+# FairGlass
 
-Midnight Hackathon: August 2026. MDNT Team (Eman, Lastos, sumap, Donalsien, Yashasvi).
+### Proof-of-Fair AI Hiring on Midnight
 
-A Compact smart contract on Midnight that cryptographically proves an AI hiring
-decision followed an agreed fairness policy, without exposing any candidate data.
+FairGlass is a privacy-first hiring prototype that uses a **Midnight Compact smart contract** to cryptographically prove that an AI-assisted hiring decision followed an agreed fairness policy, without exposing candidate data.
 
-> **Note:** The AI scoring model in this repo is **simulated**. A deterministic Python
-> function stands in for a real ML model. This is disclosed here on purpose; see
-> `scoring/README.md`.
+> **Midnight Hackathon · August 2026**  
+> **Team:** Eman · Lastos · sumap · Donalsien · Yashasvi
 
-## Folder structure
+> **Important:** The AI scoring model is **simulated**. It is a deterministic Python function, not a trained ML model.
 
+---
+
+## Why FairGlass?
+
+AI hiring systems can use attributes that a hiring policy explicitly forbids. FairGlass separates **decision-making from proof**:
+
+- Fair scoring uses only allowed attributes.
+- A biased scoring mode demonstrates a policy violation.
+- The Midnight contract verifies whether the policy was followed.
+- A successful verification produces a **fairness receipt**.
+- Candidate information stays off-chain.
+
+**FairGlass proves that a policy was followed, not that a candidate was hired.**
+
+---
+
+## Core Features
+
+| Feature | Description |
+| --- | --- |
+| **Fair AI Scoring** | Scores candidates using skills and experience |
+| **Policy Enforcement** | Rejects proofs when forbidden attributes affect a decision |
+| **Privacy by Design** | Keeps candidate data and witness data off-chain |
+| **Fairness Receipts** | Produces a verifiable receipt when the policy passes |
+| **Commitment-Based IDs** | Uses fresh SHA-256 commitments instead of exposing candidate IDs |
+| **Biased Model Demo** | Shows how forbidden attributes are detected |
+| **Local Proof Flow** | Witness data is consumed by the local proof server |
+
+---
+
+## How It Works
+
+```text
+Candidate Data
+      │
+      ▼
+┌───────────────────┐
+│ Fair / Biased     │
+│ Scoring Model     │
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│ Fairness Policy   │
+│ + Decision        │
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│ Midnight Compact  │
+│ Smart Contract    │
+└─────────┬─────────┘
+          │
+      ┌───┴───┐
+      ▼       ▼
+     PASS    FAIL
+      │       │
+      ▼       ▼
+  Receipt   No Receipt
 ```
-fairglass/
-├── frontend/     # Plain HTML/CSS/JS dashboard + receipt page    (Eman, sumap)
-├── backend/      # Flask service: runs scorer, calls proof bridge (Donalsien)
-├── scoring/      # Fair scorer + biased scorer, Python        (Donalsien)
-├── contract/     # Compact policy contract (Midnight starter kit) (Lastos)
-├── data/         # Seeded fake candidate data (JSON)              (Yashasvi, sumap)
-└── docs/         # README assets, architecture diagram, demo script (Yashasvi)
+
+The contract verifies the policy without storing the underlying candidate information.
+
+---
+
+## Privacy Model
+
+> **Show proof, not data.**
+
+### Public
+
+- Policy hash
+- Decision
+- Timestamp
+- Candidate ID commitment
+
+### Private
+
+- Candidate name
+- Age
+- Gender
+- Skills and experience witness data
+- Commitment nonce
+
+Each receipt uses:
+
+```text
+idCommitment = SHA256(domain || nonce || candidateId)
 ```
 
-## Setup 
-*Run once per laptop, Friday night*
+A fresh 32-byte nonce is generated for every receipt. Therefore, repeated screenings of the same candidate produce unrelated commitments.
+
+The nonce is returned to the employer as the commitment opening. It is never written on-chain or sent to the proof server.
+
+---
+
+## Demo
+
+### 1. Start the backend
 
 ```bash
-# 1. Clone
-git clone https://github.com/Eman2123/fairglass
-cd fairglass
-
-# 2. Backend / scoring (Python). See backend/BACKEND_SETUP.md for Windows steps.
-cd backend && python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-cd ..
-
-# 3. Frontend: no build step, but it MUST be served over HTTP (see note below)
-python3 -m http.server 8080 --directory frontend
-
-# 4. Contract: follow the Midnight starter-kit instructions in contract/README.md
+cd backend
+python app.py
 ```
 
-> **Do not open `frontend/index.html` directly from the file system.** A page
-> loaded over `file://` has a `null` origin, and the browser will block every
-> request it makes to the backend. The screen will show a CORS error that looks
-> like the backend is down when it is actually fine. Always serve the frontend
-> with the command above and browse to `http://localhost:8080`.
+Backend: `http://localhost:5000`
 
-## Running the demo
+### 2. Start the frontend
 
-Two terminals:
+From the repository root:
 
 ```bash
-# Terminal 1: the backend (from backend/, venv active)
-python app.py                 # serves http://localhost:5000
-
-# Terminal 2: the frontend (from the repo root)
 python3 -m http.server 8080 --directory frontend
 ```
 
-Open `http://localhost:8080`, then:
+Frontend: `http://localhost:8080`
 
-- **Run Fair Model** scores candidates using only skills and experience. The
-  policy holds, so the contract issues a fairness receipt.
-- **Run Biased Model** scores using age, which the policy forbids. The proof
-  fails the contract's bias gate and no receipt is issued.
+> **Do not open `frontend/index.html` directly with `file://`.** The frontend must be served over HTTP so browser requests to the backend work correctly.
 
-Watch candidates `c4` and `c5` across the two runs. `c4` is 51 years old and well
-qualified; the fair model shortlists them while the biased model rejects them purely because of age.
-`c5` is 23 and underqualified; the fair model drops them while the biased model
-shortlists them. 
-The policy is the same in both runs; only the use of age changes the outcome, which is exactly what the contract refuses to certify.
+### 3. Try the two models
 
-A rejected candidate can still produce a valid fairness receipt. The proof verifies that the hiring policy was followed, not that the candidate was hired.
+**Fair Model**
+- Uses skills and years of experience.
+- The policy passes.
+- A fairness receipt is issued.
 
-To check the backend on its own, run `python test_backend.py` from `backend/`.
+**Biased Model**
+- Intentionally uses age.
+- Age is forbidden by the policy.
+- The proof fails and no fairness receipt is issued.
 
-## Team roles
+Compare candidates `c4` and `c5` across both runs to see the effect of the forbidden attribute.
 
-See the shared team work plan doc for the full task breakdown, critical path
-and 48-hour timeline. Ownership below is the current state, not the original
-plan, so trust this table over the doc where they differ.
+### Privacy page
 
-| Person | Role | Folder |
-|---|---|---|
-| Eman | Tech Lead + Frontend | `frontend/` |
-| Lastos | Compact Engineer | `contract/` |
-| Donalsien (KADHACK) | Integrator / Backend | `backend/`, `scoring/`, `contract/bridge/` |
-| sumap | Frontend + Data | `frontend/`, `data/` |
-| Yashasvi | Docs, Video, Submission | `docs/` |
+With the app running, open:
 
-## Policy (locked Friday night)
-
-- **Allowed attributes:** skills, years of experience
-- **Forbidden attributes:** name, age, gender
-- **Data requirement:** All seed data in `data/` must be synthetic. No real names, no real resumes.
-
-## Running the demo for judges
-
-[DEMO_RUNBOOK.md](docs/DEMO_RUNBOOK.md) has the pre-flight checks, the click order, what each
-screen proves, what to do if something breaks mid-run, and the answers to the
-questions judges are most likely to ask.
-
-## Privacy design: what the ledger actually stores
-
-The principle is simple: **show proof, not data.** Here is how the privacy design supports it.
-
-### The ledger key is a commitment, not an identifier
-
-Every fairness receipt is stored on chain under an `idCommitment`:
-
-```
-idCommitment = SHA256( domain || nonce || candidateId )
-```
-
-where `nonce` is **32 fresh random bytes generated per receipt**. That nonce is
-what turns a lookup key into a commitment, and it buys two properties:
-
-**Hiding.** Someone reading the ledger sees a 32-byte value and learns nothing
-from it. They cannot brute force it even knowing the ids look like `c1`..`c10`,
-because they would also have to guess 256 bits of nonce. And because the nonce
-is fresh each time, two screenings of the same candidate produce completely
-unrelated commitments. The chain cannot be mined for "how many times was this
-person screened and rejected", which a fixed key would have leaked.
-
-**Binding.** SHA256 collision resistance means whoever created the commitment
-cannot later claim it referred to a different candidate.
-
-The nonce is the **opening**. It is returned to the employer who ran the
-screening, is never written on chain, and is never sent to the proof server.
-Holding it lets you prove which candidate a receipt refers to. Not holding it
-means you cannot, and the binding property means the holder cannot lie about it
-either.
-
-You can check both properties yourself, see below.
-
-### What crosses which boundary
-
-| Data | Where it goes |
-|---|---|
-| policy hash, decision, timestamp, id commitment | public ledger |
-| skills score, experience years, forbidden-data flag | witness only, consumed by the proof server on the local machine |
-| candidate name, age, gender | never read by the fair scorer, never sent anywhere |
-| commitment nonce | returned to the employer, never transmitted onward |
-
-The proof server runs locally by design. Witness data never leaves the machine
-even when the chain is public. Every `/screen` response carries a `disclosure`
-object stating this per request, and the test suite asserts that no forbidden
-field and no nonce ever appears in the on-chain block.
-
-### Check it yourself
-
-With the backend and frontend running, open:
-
-```
+```text
 http://localhost:8080/privacy.html
 ```
 
-Run a screening twice and compare the commitments: same candidate, unrelated
-values, which is hiding. Then try to open the commitment as the real candidate
-(it opens) and as any other (it refuses), which is binding.
+Run the screening twice and compare commitments to inspect the hiding/binding behavior.
 
-### Honest limits
+---
 
-The scoring model is a deterministic Python function, not a trained ML model.
-The commitment is a hash commitment, which is computationally hiding and
-binding under SHA256; it is not a Pedersen commitment and offers no
-homomorphic properties, which this design does not need. Seed data is fully
-synthetic.
+## Policy
 
-## AI tool disclosure
+**Allowed attributes**
+- Skills
+- Years of experience
 
-Per MLH rules, the team discloses use of AI coding assistants (including
-Claude Code) during the hackathon. All architecture and integration decisions
-were made by the team.
+**Forbidden attributes**
+- Name
+- Age
+- Gender
+
+All candidate data in `data/` is synthetic.
+
+---
+
+## Project Structure
+
+```text
+fairglass/
+├── frontend/     # HTML/CSS/JS dashboard + receipt pages
+├── backend/      # Flask service + proof bridge
+├── scoring/      # Fair and biased scoring functions
+├── contract/     # Midnight Compact policy contract
+├── data/         # Synthetic candidate data
+└── docs/         # Demo runbook and documentation
+```
+
+---
+
+## Tech Stack
+
+- **Midnight Compact** — policy verification
+- **Python** — scoring and backend services
+- **Flask** — backend API
+- **HTML / CSS / JavaScript** — frontend
+- **SHA-256** — candidate ID commitments
+- **Synthetic JSON** — demo data
+
+---
+
+## Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Eman2123/fairglass.git
+cd fairglass
+```
+
+Create the backend environment:
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cd ..
+```
+
+For Windows-specific instructions, see `backend/BACKEND_SETUP.md` if present.
+
+For the Midnight contract, follow:
+
+```text
+contract/README.md
+```
+
+---
+
+## Testing
+
+Run the backend tests:
+
+```bash
+cd backend
+python test_backend.py
+```
+
+---
+
+## Honest Limitations
+
+- The scoring model is a deterministic Python simulation, not a trained ML model.
+- The commitment uses SHA-256 and is intended to provide computational hiding and binding.
+- It is **not** a Pedersen commitment and provides no homomorphic properties.
+- All demo candidate data is synthetic.
+
+---
+
+## Team
+
+| Member | Role | Area |
+| --- | --- | --- |
+| **Eman** | Tech Lead + Frontend | `frontend/` |
+| **Lastos** | Compact Engineer | `contract/` |
+| **Donalsien (KADHACK)** | Integrator / Backend | `backend/`, `scoring/`, `contract/bridge/` |
+| **sumap** | Frontend + Data | `frontend/`, `data/` |
+| **Yashasvi** | Docs, Video + Submission | `docs/` |
+
+---
+
+## Documentation
+
+- [Demo Runbook](docs/DEMO_RUNBOOK.md)
+- [Backend Setup](backend/BACKEND_SETUP.md)
+- [Compact Contract](contract/README.md)
+- [Scoring Notes](scoring/README.md)
+
+---
+
+## AI Disclosure
+
+The team used AI coding assistants, including Claude Code, during the hackathon. Architecture, product decisions, and integration decisions were made by the team.
+
+---
+
+## License
+
+This project was created as a hackathon prototype.
