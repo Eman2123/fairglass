@@ -4,7 +4,7 @@
 
 <div align="center">
 
-![FairGlass](https://img.shields.io/badge/FairGlass-Privacy--Preserving%20AI%20Hiring-111827?style=for-the-badge)
+<img src="docs/fairglass-banner.svg" alt="FairGlass - Privacy-Preserving AI Hiring" width="100%">
 ![Midnight](https://img.shields.io/badge/Midnight-Compact-6366F1?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white)
